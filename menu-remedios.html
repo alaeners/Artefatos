@@ -1,0 +1,209 @@
+<title>Menu de Remédios</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: cabeçalho + abas por tipo de uso + tabela com status de validade + formulário de cadastro */
+:root{
+  --bg:#f4f6f3; --surface:#ffffff; --fg:#1d2a26; --muted:#5d6d67; --line:#dbe3de;
+  --accent:#1f6f5c; --accent-fg:#ffffff;
+  --human:#2b5fa8; --human-bg:#e4edf9;
+  --vet:#a65a1c; --vet-bg:#f9ebdc;
+  --both:#6b4aa0; --both-bg:#eee7f8;
+  --ok:#1d7a46; --ok-bg:#dff3e6; --warn:#9a6b00; --warn-bg:#fbf0cc; --bad:#b3261e; --bad-bg:#fbe1de;
+  --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12191a; --surface:#1a2425; --fg:#e6eeea; --muted:#9bb0a8; --line:#2c3a3a;
+  --accent:#58c4a4; --accent-fg:#0d1f1a;
+  --human:#8db6ee; --human-bg:#1d2d45; --vet:#efb072; --vet-bg:#40291a; --both:#c3a8ee; --both-bg:#302443;
+  --ok:#6fd49a; --ok-bg:#16301f; --warn:#f0cd66; --warn-bg:#3a3012; --bad:#f2918a; --bad-bg:#3d1b18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12191a; --surface:#1a2425; --fg:#e6eeea; --muted:#9bb0a8; --line:#2c3a3a;
+  --accent:#58c4a4; --accent-fg:#0d1f1a;
+  --human:#8db6ee; --human-bg:#1d2d45; --vet:#efb072; --vet-bg:#40291a; --both:#c3a8ee; --both-bg:#302443;
+  --ok:#6fd49a; --ok-bg:#16301f; --warn:#f0cd66; --warn-bg:#3a3012; --bad:#f2918a; --bad-bg:#3d1b18; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--font-display);font-size:clamp(26px,5vw,36px);line-height:1.15;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.today{font-variant-numeric:tabular-nums;font-weight:600;color:var(--fg)}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{font:inherit;font-weight:500;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.tab .n{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted)}
+.tab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tab[aria-pressed="true"] .n{color:inherit;opacity:.85}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input,select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
+.search{flex:1 1 220px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:8px;padding:10px 16px;background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line);font-weight:500}
+
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.name{font-weight:600;min-width:150px}
+td.date{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:2px 7px;margin-top:4px}
+.tag.humano{background:var(--human-bg);color:var(--human)}
+.tag.vet{background:var(--vet-bg);color:var(--vet)}
+.tag.comum{background:var(--both-bg);color:var(--both)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;border-radius:999px;padding:4px 11px;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.dias{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;padding:4px 6px;border-radius:6px}
+.del:hover{color:var(--bad)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+
+form{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;align-items:end}
+form h2{grid-column:1/-1;margin:0;font-family:var(--font-display);font-size:20px}
+label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:500;color:var(--muted);min-width:0}
+label input,label select{width:100%}
+.wide{grid-column:1/-1}
+.note{font-size:13px;color:var(--muted);margin:0;max-width:75ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Menu de Remédios</h1>
+    <p class="sub">Escolha o tipo de uso e confira o que serve cada remédio e se ainda está dentro da validade. Hoje é <span class="today" id="hoje"></span>.</p>
+  </header>
+
+  <div class="tabs" id="tabs" role="group" aria-label="Tipo de uso"></div>
+
+  <div class="tools">
+    <input class="search" id="busca" type="search" placeholder="Buscar por nome ou finalidade" aria-label="Buscar remédio">
+    <select id="statusFiltro" aria-label="Filtrar por validade">
+      <option value="todos">Toda validade</option>
+      <option value="ok">Dentro da validade</option>
+      <option value="bad">Vencidos</option>
+    </select>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Remédio</th><th>Para que serve</th><th>Exemplo de uso</th><th>Validade</th><th>Situação</th><th><span class="sr" style="position:absolute;left:-9999px">Remover</span></th></tr></thead>
+      <tbody id="corpo"></tbody>
+    </table>
+  </div>
+
+  <form id="form">
+    <h2>Adicionar remédio</h2>
+    <label>Nome<input id="fNome" required placeholder="Ex.: Dipirona 500 mg"></label>
+    <label>Tipo de uso
+      <select id="fTipo"><option value="humano">Uso humano</option><option value="vet">Uso veterinário</option><option value="comum">Uso em comum</option></select>
+    </label>
+    <label>Data de validade<input id="fData" type="date" required></label>
+    <label class="wide">Para que serve<input id="fServe" required placeholder="Ex.: Dor e febre"></label>
+    <label class="wide">Exemplo de uso<input id="fUso" required placeholder="Ex.: 1 comprimido a cada 6 horas, conforme a bula"></label>
+    <div class="wide" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" type="submit">Adicionar</button>
+      <button class="btn ghost" type="button" id="restaurar">Restaurar lista de exemplo</button>
+    </div>
+  </form>
+
+  <p class="note">A lista inicial é só de exemplo. Edite com os remédios que você tem em casa; o que você adiciona fica salvo neste navegador. Os usos descritos são genéricos e não substituem a bula, o médico ou o veterinário. Em animais, a dose depende da espécie e do peso: nunca dê remédio de uso humano ao pet sem orientação veterinária.</p>
+</div>
+
+<script>
+(function(){
+  var HOJE = new Date(); HOJE.setHours(0,0,0,0);
+  var TIPOS = {humano:'Uso humano', vet:'Uso veterinário', comum:'Uso em comum'};
+  var KEY = 'menu-remedios-v1';
+
+  function iso(offsetDias){var d=new Date(HOJE);d.setDate(d.getDate()+offsetDias);return d.toISOString().slice(0,10)}
+  function exemplos(){return [
+    {nome:'Paracetamol 750 mg',tipo:'humano',serve:'Dor leve a moderada e febre',uso:'1 comprimido a cada 8 horas, se necessário',data:iso(420)},
+    {nome:'Ibuprofeno 600 mg',tipo:'humano',serve:'Dor, inflamação e febre',uso:'1 comprimido a cada 8 horas, após comer',data:iso(25)},
+    {nome:'Loratadina 10 mg',tipo:'humano',serve:'Alergia (coriza, coceira, espirros)',uso:'1 comprimido ao dia',data:iso(-40)},
+    {nome:'Omeprazol 20 mg',tipo:'humano',serve:'Azia e refluxo',uso:'1 cápsula em jejum pela manhã',data:iso(300)},
+    {nome:'Vermífugo para cães e gatos',tipo:'vet',serve:'Verminoses intestinais',uso:'Dose única conforme o peso do animal, com orientação do veterinário',data:iso(190)},
+    {nome:'Antipulgas e carrapatos',tipo:'vet',serve:'Controle de pulgas e carrapatos',uso:'1 aplicação a cada 30 dias, conforme o peso do animal',data:iso(12)},
+    {nome:'Colírio veterinário',tipo:'vet',serve:'Irritação e secreção nos olhos do animal',uso:'1 gota em cada olho 2 vezes ao dia, se indicado',data:iso(-120)},
+    {nome:'Amoxicilina',tipo:'comum',serve:'Infecções por bactérias (só com receita)',uso:'Dose e duração definidas pelo médico ou veterinário',data:iso(75)},
+    {nome:'Soro fisiológico 0,9%',tipo:'comum',serve:'Limpeza de feridas e lavagem de olhos e nariz',uso:'Aplicar sobre o local, sem esfregar',data:iso(500)},
+    {nome:'Pomada cicatrizante',tipo:'comum',serve:'Cicatrização de pequenas lesões na pele',uso:'Camada fina no local, 1 a 2 vezes ao dia',data:iso(-5)}
+  ]}
+
+  var lista, filtro='todos';
+  function carregar(){
+    try{var s=localStorage.getItem(KEY); if(s){var p=JSON.parse(s); if(Array.isArray(p)) return p}}catch(e){}
+    return exemplos();
+  }
+  function salvar(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
+
+  function situacao(dataISO){
+    var p=dataISO.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]);
+    var dias=Math.round((d-HOJE)/86400000);
+    if(dias<0) return {cls:'bad',txt:'Vencido',det:'venceu há '+(-dias)+(dias===-1?' dia':' dias')};
+    if(dias<=30) return {cls:'warn',txt:'Dentro da validade',det:dias===0?'vence hoje':'vence em '+dias+(dias===1?' dia':' dias'),ok:true};
+    return {cls:'ok',txt:'Dentro da validade',det:'vence em '+dias+' dias',ok:true};
+  }
+  function fmt(dataISO){var p=dataISO.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+  function desenharAbas(){
+    var cont={todos:lista.length,humano:0,vet:0,comum:0};
+    lista.forEach(function(r){cont[r.tipo]++});
+    var nomes={todos:'Todos',humano:'Uso humano',vet:'Uso veterinário',comum:'Uso em comum'};
+    var el=document.getElementById('tabs'); el.innerHTML='';
+    Object.keys(nomes).forEach(function(k){
+      var b=document.createElement('button'); b.className='tab'; b.type='button';
+      b.setAttribute('aria-pressed',String(filtro===k));
+      b.innerHTML=nomes[k]+' <span class="n">'+cont[k]+'</span>';
+      b.onclick=function(){filtro=k;desenhar()};
+      el.appendChild(b);
+    });
+  }
+
+  function desenhar(){
+    desenharAbas();
+    var q=document.getElementById('busca').value.trim().toLowerCase();
+    var sf=document.getElementById('statusFiltro').value;
+    var linhas=lista.map(function(r,i){return {r:r,i:i,s:situacao(r.data)}}).filter(function(x){
+      if(filtro!=='todos' && x.r.tipo!==filtro) return false;
+      if(sf==='ok' && !x.s.ok) return false;
+      if(sf==='bad' && x.s.ok) return false;
+      if(q && (x.r.nome+' '+x.r.serve).toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    var tb=document.getElementById('corpo');
+    if(!linhas.length){tb.innerHTML='<tr><td colspan="6" class="empty">Nenhum remédio encontrado com esses filtros.</td></tr>';return}
+    tb.innerHTML=linhas.map(function(x){
+      var tag={humano:'humano',vet:'vet',comum:'comum'}[x.r.tipo];
+      return '<tr><td class="name">'+esc(x.r.nome)+'<br><span class="tag '+tag+'">'+TIPOS[x.r.tipo]+'</span></td>'+
+        '<td>'+esc(x.r.serve)+'</td><td>'+esc(x.r.uso)+'</td>'+
+        '<td class="date">'+fmt(x.r.data)+'</td>'+
+        '<td><span class="pill '+x.s.cls+'">'+x.s.txt.replace('Dentro da validade',x.s.ok?'Dentro da validade':'')+'</span><span class="dias">'+x.s.det+'</span></td>'+
+        '<td><button class="del" type="button" data-i="'+x.i+'" aria-label="Remover '+esc(x.r.nome)+'">Remover</button></td></tr>';
+    }).join('');
+  }
+
+  document.getElementById('hoje').textContent=HOJE.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('busca').addEventListener('input',desenhar);
+  document.getElementById('statusFiltro').addEventListener('change',desenhar);
+  document.getElementById('corpo').addEventListener('click',function(e){
+    var b=e.target.closest('.del'); if(!b) return;
+    lista.splice(+b.getAttribute('data-i'),1); salvar(); desenhar();
+  });
+  document.getElementById('form').addEventListener('submit',function(e){
+    e.preventDefault();
+    lista.push({nome:document.getElementById('fNome').value.trim(),tipo:document.getElementById('fTipo').value,
+      serve:document.getElementById('fServe').value.trim(),uso:document.getElementById('fUso').value.trim(),data:document.getElementById('fData').value});
+    salvar(); e.target.reset(); desenhar();
+  });
+  document.getElementById('restaurar').addEventListener('click',function(){lista=exemplos();salvar();desenhar()});
+
+  lista=carregar(); desenhar();
+})();
+</script>
