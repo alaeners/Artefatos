@@ -48,7 +48,7 @@ input,select{font:inherit;color:var(--fg);background:var(--surface);border:1px s
 .grupo h2{font-family:var(--font-display);font-size:20px;margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .grupo h2 small{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--muted)}
 .tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
-table{width:100%;border-collapse:collapse;min-width:760px}
+table{width:100%;border-collapse:collapse;min-width:900px}
 th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
@@ -87,7 +87,7 @@ label input,label select{width:100%}
   <div class="tabs" id="tabs" role="group" aria-label="Tipo de uso"></div>
 
   <div class="tools">
-    <input class="search" id="busca" type="search" placeholder="Buscar por nome ou finalidade" aria-label="Buscar remédio">
+    <input class="search" id="busca" type="search" placeholder="Buscar por nome, nome comercial ou finalidade" aria-label="Buscar remédio">
     <select id="catFiltro" aria-label="Filtrar por finalidade"></select>
     <select id="statusFiltro" aria-label="Filtrar por validade">
       <option value="todos">Toda validade</option>
@@ -101,6 +101,7 @@ label input,label select{width:100%}
   <form id="form">
     <h2>Adicionar remédio</h2>
     <label>Nome<input id="fNome" required placeholder="Ex.: Dipirona 500 mg"></label>
+    <label>Nome comercial<input id="fCom" placeholder="Ex.: Tylenol"></label>
     <label>Tipo de uso
       <select id="fTipo"><option value="humano">Uso humano</option><option value="vet">Uso veterinário</option><option value="comum">Uso em comum</option></select>
     </label>
@@ -125,22 +126,22 @@ label input,label select{width:100%}
 
   function iso(offsetDias){var d=new Date(HOJE);d.setDate(d.getDate()+offsetDias);return d.toISOString().slice(0,10)}
   function exemplos(){return [
-    {nome:'Paracetamol 750 mg',tipo:'humano',cat:'Febre, Dor',serve:'Dor leve a moderada e febre',uso:'1 comprimido a cada 8 horas, se necessário',data:iso(420)},
-    {nome:'Ibuprofeno 600 mg',tipo:'humano',cat:'Febre, Dor, Inflamação',serve:'Dor, inflamação e febre',uso:'1 comprimido a cada 8 horas, após comer',data:iso(25)},
-    {nome:'Dipirona 500 mg',tipo:'comum',cat:'Febre, Dor',serve:'Febre e dor; também usada em animais com orientação veterinária',uso:'Dose definida pelo médico ou veterinário conforme peso',data:iso(210)},
-    {nome:'Loratadina 10 mg',tipo:'humano',cat:'Alergia',serve:'Alergia (coriza, coceira, espirros)',uso:'1 comprimido ao dia',data:iso(-40)},
-    {nome:'Omeprazol 20 mg',tipo:'humano',cat:'Azia e refluxo',serve:'Azia e refluxo',uso:'1 cápsula em jejum pela manhã',data:iso(300)},
-    {nome:'Vermífugo para cães e gatos',tipo:'vet',cat:'Vermes',serve:'Verminoses intestinais',uso:'Dose única conforme o peso do animal, com orientação do veterinário',data:iso(190)},
-    {nome:'Antipulgas e carrapatos',tipo:'vet',cat:'Pulgas e carrapatos',serve:'Controle de pulgas e carrapatos',uso:'1 aplicação a cada 30 dias, conforme o peso do animal',data:iso(12)},
+    {nome:'Paracetamol 750 mg',comercial:'Tylenol',tipo:'humano',cat:'Febre, Dor',serve:'Dor leve a moderada e febre',uso:'1 comprimido a cada 8 horas, se necessário',data:iso(420)},
+    {nome:'Ibuprofeno 600 mg',comercial:'Advil, Alivium',tipo:'humano',cat:'Febre, Dor, Inflamação',serve:'Dor, inflamação e febre',uso:'1 comprimido a cada 8 horas, após comer',data:iso(25)},
+    {nome:'Dipirona 500 mg',comercial:'Novalgina',tipo:'comum',cat:'Febre, Dor',serve:'Febre e dor; também usada em animais com orientação veterinária',uso:'Dose definida pelo médico ou veterinário conforme peso',data:iso(210)},
+    {nome:'Loratadina 10 mg',comercial:'Claritin',tipo:'humano',cat:'Alergia',serve:'Alergia (coriza, coceira, espirros)',uso:'1 comprimido ao dia',data:iso(-40)},
+    {nome:'Omeprazol 20 mg',comercial:'Losec, Peprazol',tipo:'humano',cat:'Azia e refluxo',serve:'Azia e refluxo',uso:'1 cápsula em jejum pela manhã',data:iso(300)},
+    {nome:'Vermífugo para cães e gatos',comercial:'Drontal',tipo:'vet',cat:'Vermes',serve:'Verminoses intestinais',uso:'Dose única conforme o peso do animal, com orientação do veterinário',data:iso(190)},
+    {nome:'Antipulgas e carrapatos',comercial:'NexGard, Bravecto',tipo:'vet',cat:'Pulgas e carrapatos',serve:'Controle de pulgas e carrapatos',uso:'1 aplicação a cada 30 dias, conforme o peso do animal',data:iso(12)},
     {nome:'Colírio veterinário',tipo:'vet',cat:'Olhos',serve:'Irritação e secreção nos olhos do animal',uso:'1 gota em cada olho 2 vezes ao dia, se indicado',data:iso(-120)},
-    {nome:'Amoxicilina',tipo:'comum',cat:'Infecção',serve:'Infecções por bactérias (só com receita)',uso:'Dose e duração definidas pelo médico ou veterinário',data:iso(75)},
+    {nome:'Amoxicilina',comercial:'Amoxil',tipo:'comum',cat:'Infecção',serve:'Infecções por bactérias (só com receita)',uso:'Dose e duração definidas pelo médico ou veterinário',data:iso(75)},
     {nome:'Soro fisiológico 0,9%',tipo:'comum',cat:'Feridas e cicatrização',serve:'Limpeza de feridas e lavagem de olhos e nariz',uso:'Aplicar sobre o local, sem esfregar',data:iso(500)},
-    {nome:'Pomada cicatrizante',tipo:'comum',cat:'Feridas e cicatrização',serve:'Cicatrização de pequenas lesões na pele',uso:'Camada fina no local, 1 a 2 vezes ao dia',data:iso(-5)}
+    {nome:'Pomada cicatrizante',comercial:'Cicatrene',tipo:'comum',cat:'Feridas e cicatrização',serve:'Cicatrização de pequenas lesões na pele',uso:'Camada fina no local, 1 a 2 vezes ao dia',data:iso(-5)}
   ]}
 
   var lista, filtro='todos';
   function carregar(){
-    try{var s=localStorage.getItem(KEY); if(s){var p=JSON.parse(s); if(Array.isArray(p)) return p}}catch(e){}
+    try{var s=localStorage.getItem(KEY); if(s){var p=JSON.parse(s); if(Array.isArray(p)){var ex=exemplos();p.forEach(function(r){if(r.comercial===undefined){var m=ex.filter(function(e){return e.nome===r.nome})[0];r.comercial=m?m.comercial||'':''}});return p}}}catch(e){}
     return exemplos();
   }
   function salvar(){try{localStorage.setItem(KEY,JSON.stringify(lista))}catch(e){}}
@@ -187,7 +188,7 @@ label input,label select{width:100%}
       if(filtro!=='todos' && r.tipo!==filtro) return;
       if(sf==='ok' && !s.ok) return;
       if(sf==='bad' && s.ok) return;
-      if(q && (r.nome+' '+r.serve+' '+(r.cat||'')).toLowerCase().indexOf(q)<0) return;
+      if(q && (r.nome+' '+(r.comercial||'')+' '+r.serve+' '+(r.cat||'')).toLowerCase().indexOf(q)<0) return;
       cats(r).forEach(function(c){
         if(atual!=='todas' && c!==atual) return;
         (grupos[c]=grupos[c]||[]).push({r:r,i:i,s:s});
@@ -201,13 +202,13 @@ label input,label select{width:100%}
       var linhas=itens.map(function(x){
         var tag={humano:'humano',vet:'vet',comum:'comum'}[x.r.tipo];
         return '<tr><td class="name">'+esc(x.r.nome)+'<br><span class="tag '+tag+'">'+TIPOS[x.r.tipo]+'</span></td>'+
-          '<td>'+esc(x.r.serve)+'</td><td>'+esc(x.r.uso)+'</td>'+
+          '<td>'+(x.r.comercial?esc(x.r.comercial):'<span style="color:var(--muted)">—</span>')+'</td><td>'+esc(x.r.serve)+'</td><td>'+esc(x.r.uso)+'</td>'+
           '<td class="date">'+fmt(x.r.data)+'</td>'+
           '<td><span class="pill '+x.s.cls+'">'+x.s.txt+'</span><span class="dias">'+x.s.det+'</span></td>'+
           '<td><button class="del" type="button" data-i="'+x.i+'" aria-label="Remover '+esc(x.r.nome)+'">Remover</button></td></tr>';
       }).join('');
       return '<section class="grupo"><h2>Remédios que podem melhorar: '+esc(c)+' <small>'+itens.length+(itens.length===1?' remédio':' remédios')+'</small></h2>'+
-        '<div class="tablebox"><table><thead><tr><th>Remédio</th><th>Para que serve</th><th>Exemplo de uso</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
+        '<div class="tablebox"><table><thead><tr><th>Remédio</th><th>Nome comercial</th><th>Para que serve</th><th>Exemplo de uso</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
     }).join('');
   }
 
@@ -222,7 +223,7 @@ label input,label select{width:100%}
   document.getElementById('form').addEventListener('submit',function(e){
     e.preventDefault();
     lista.push({nome:document.getElementById('fNome').value.trim(),tipo:document.getElementById('fTipo').value,
-      cat:document.getElementById('fCat').value.trim(),serve:document.getElementById('fServe').value.trim(),uso:document.getElementById('fUso').value.trim(),data:document.getElementById('fData').value});
+      cat:document.getElementById('fCat').value.trim(),comercial:document.getElementById('fCom').value.trim(),serve:document.getElementById('fServe').value.trim(),uso:document.getElementById('fUso').value.trim(),data:document.getElementById('fData').value});
     salvar(); e.target.reset(); desenhar();
   });
   document.getElementById('restaurar').addEventListener('click',function(){lista=exemplos();salvar();desenhar()});
